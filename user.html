@@ -32,9 +32,21 @@
     li {
       padding: 10px;
       margin-bottom: 10px;
-      background-color: #ffffff;
+      background-color: #fcfe95;
       border-radius: 5px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    button {
+      width: 30%;
+      justify-content: center;
+      font-family: 'Courier New', Courier, monospace;
+      margin-top: 30px;
+      display: flex-start;
+      border-radius: 30px;
+      padding: 0px;
+      background-color: #0e0e0d;
+      color: rgb(255, 254, 254);
+      cursor: pointer;
     }
   </style>
 </head>
@@ -43,12 +55,15 @@
     <h1>Welcome User!</h1>
     <h2>Your Tasks will be visible here-</h2>
     <div id="tasksContainer"></div>
+    <button id="deleteTasksButton"><p>Delete Tasks<p></button>
+    
   </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
     import { getDatabase, ref, query, orderByChild, equalTo, onValue } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js";
+    import { get, remove } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js";
 
     const firebaseConfig = {
     apiKey: "AIzaSyBGhD0b0IhLlDFFwxnEu8iIBsGMrMNs9c4",
@@ -83,8 +98,8 @@
 
               const taskItem = document.createElement('li');
               taskItem.innerHTML = `
-                <h3>${task_name}</h3>
-                <p>${task_description}</p>
+                <h3>Task-${task_name}</h3>
+                <p>Description-${task_description}</p>
               `;
               tasksContainer.appendChild(taskItem);
             });
@@ -94,6 +109,23 @@
             tasksContainer.appendChild(noTasksMessage);
           }
         });
+
+        document.getElementById('deleteTasksButton').addEventListener('click', () => {
+        const tasksRef = ref(database, 'tasks');
+        get(tasksRef).then((snapshot) => {
+        if (snapshot.exists()) {
+         snapshot.forEach((childSnapshot) => {
+         remove(childSnapshot.ref);
+      });
+
+      alert('Tasks succesfully deleted!');
+    } else {
+      alert('No tasks to delete!');
+    }
+  }).catch((error) => {
+    console.error("Error deleting tasks: ", error);
+  });
+});
       } else {
       }
     });
